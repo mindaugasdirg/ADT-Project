@@ -11,13 +11,15 @@ import java.util.LinkedList;
  * @author Mindaugas
  */
 public class HashSet<K, E> implements HashSetAPI<K, E> {
-    private static final int SIZE = 2147483647;
+    private static final int SIZE = 2000000;
     private LinkedList<K> keys;
     private LinkedList<E>[] values;
+    private int size;
     
     public HashSet(){
         keys = new LinkedList<>();
         values = new LinkedList[SIZE];
+        size = 0;
     }
     
     @Override
@@ -29,6 +31,7 @@ public class HashSet<K, E> implements HashSetAPI<K, E> {
         }
         
         values[k.hashCode()].add(e);
+        size++;
     }
 
     @Override
@@ -38,8 +41,10 @@ public class HashSet<K, E> implements HashSetAPI<K, E> {
             
             if(values[k.hashCode()].size() == 1){
                 values[k.hashCode()] = null;
+                size--;
             } else {
                 values[k.hashCode()].remove(e);
+                size--;
             }
         }
     }
@@ -58,4 +63,8 @@ public class HashSet<K, E> implements HashSetAPI<K, E> {
         return (K[])keys.clone();
     }
     
+    @Override
+    public int size(){
+        return size;
+    }
 }

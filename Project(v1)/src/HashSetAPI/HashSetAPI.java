@@ -14,4 +14,5 @@ public interface HashSetAPI<K, E>{
     void remove(K k, E e);
     E get(K k);
     K[] getKeys();
+    int size();
 }
