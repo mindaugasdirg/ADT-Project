@@ -12,7 +12,7 @@ import java.util.Objects;
  *
  * @author Mindaugas
  */
-public class HashSet<K, E> implements HashSetAPI<K, E> {
+public class HashSet<K, E> implements HashSetAPI<K, E>{
     private static final int SIZE = 2000000;
     private LinkedList<K> keys;
     private LinkedList<Pair<K, E>>[] values;
@@ -87,6 +87,51 @@ public class HashSet<K, E> implements HashSetAPI<K, E> {
     @Override
     public int size(){
         return size;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return new HashSetIterator<E>();
+    }
+    
+    private class HashSetIterator<E> implements Iterator<E>{
+        int i;
+        int j;
+        K key;
+        
+        public HashSetIterator(){
+            i = 0;
+            j = 0;
+            key = keys.get(i);
+        }
+        
+        @Override
+        public boolean hasNext() {
+            return i != keys.size();
+        }
+
+        @Override
+        public E next() {
+            if(i != keys.size()){
+                E item = (E) values[key.hashCode()].get(j).getValue();
+                
+                j++;
+                
+                if(j == values[key.hashCode()].size()){
+                    i++;
+                    j = 0;
+                    if(i < keys.size()){
+                        key = keys.get(i);
+                    } else {
+                        key = null;
+                    }
+                }
+                
+                return item;
+            }
+            
+            return null;
+        }
     }
     
     private class Pair<K, E>{

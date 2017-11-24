@@ -5,6 +5,7 @@
 package Tests;
 
 import HashSetAPI.HashSet;
+import java.util.Iterator;
 
 /**
  *
@@ -14,6 +15,7 @@ public class HashSetTests {
     static void runTests(){
         test1();
         test2();
+        test3();
     }
 
     private static void test1() {
@@ -99,6 +101,48 @@ public class HashSetTests {
             System.out.println("Test 2 successful");
         } else {
             System.out.println("Test 2 failed");
+        }
+    }
+    
+    private static void test3(){
+        System.out.println("Performing test 3");
+        HashSet<String, Integer> testSet = new HashSet<>();
+        int successful = 0;
+        
+        testSet.add("a", 1);
+        testSet.add("A", 2);
+        testSet.add("b", 3);
+        testSet.add("AAA", 5);
+        
+        Iterator<Integer> i = testSet.iterator();
+        Integer[] set = new Integer[10];
+        int count = 0;
+        
+        while(i.hasNext()){
+            set[count] = i.next();
+            count++;
+        }
+        
+        if(count == 4){
+            successful++;
+        }
+        if(set[0] == 1){
+            successful++;
+        }
+        if(set[1] == 2){
+            successful++;
+        }
+        if(set[2] == 3){
+            successful++;
+        }
+        if(set[3] == 5){
+            successful++;
+        }
+        
+        if(successful == 5){
+            System.out.println("Test 3 successful");
+        } else {
+            System.out.println("Test 3 failed");
         }
     }
     

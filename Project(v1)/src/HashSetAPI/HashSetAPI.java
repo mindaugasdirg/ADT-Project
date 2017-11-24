@@ -9,7 +9,7 @@ package HashSetAPI;
  *
  * @author Mindaugas
  */
-public interface HashSetAPI<K, E>{
+public interface HashSetAPI<K, E> extends Iterable<E>{
     void add(K k, E e);
     void remove(K k);
     E get(K k);
