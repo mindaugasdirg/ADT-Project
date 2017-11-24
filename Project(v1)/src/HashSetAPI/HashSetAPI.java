@@ -11,8 +11,8 @@ package HashSetAPI;
  */
 public interface HashSetAPI<K, E>{
     void add(K k, E e);
-    void remove(K k, E e);
+    void remove(K k);
     E get(K k);
-    K[] getKeys();
+    Object[] getKeys();
     int size();
 }

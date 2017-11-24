@@ -43,7 +43,16 @@ public class HashSetTests {
             successful++;
         }
         
-        if(successful == 5){
+        Object[] keys = testSet.getKeys();
+        if((Integer)keys[0] == 1 && (Integer)keys[1] == 2 && (Integer)keys[2] == 3 && (Integer)keys[3] == 4){
+            successful++;
+        }
+        testSet.remove(1);
+        if(testSet.size() == 3 && testSet.get(1) == null){
+            successful++;
+        }
+        
+        if(successful == 7){
             System.out.println("Test 1 successful");
         } else {
             System.out.println("Test 1 failed");
@@ -77,7 +86,16 @@ public class HashSetTests {
             successful++;
         }
         
-        if(successful == 5){
+        Object[] keys = testSet.getKeys();
+        if((String)keys[0] == "a" && (String)keys[1] == "A" && (String)keys[2] == "b" && (String)keys[3] == "AAA"){
+            successful++;
+        }
+        testSet.remove("a");
+        if(testSet.size() == 3 && testSet.get("a") == null){
+            successful++;
+        }
+        
+        if(successful == 7){
             System.out.println("Test 2 successful");
         } else {
             System.out.println("Test 2 failed");
