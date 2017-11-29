@@ -24,16 +24,20 @@ public class HashSet<K, E> implements HashSetAPI<K, E>{
         size = 0;
     }
     
+    private int getIndex(K k){
+        return k.hashCode() % SIZE < 0 ? 0 : k.hashCode() % SIZE;
+    }
+    
     @Override
     public void add(K k, E e) {
         keys.add(k);
         
-        if(values[k.hashCode()] == null){
-            values[k.hashCode()] = new LinkedList<Pair<K, E>>();
+        if(values[getIndex(k)] == null){
+            values[getIndex(k)] = new LinkedList<Pair<K, E>>();
         }
         
         Pair<K, E> pair = new Pair<>(k, e);
-        values[k.hashCode()].add(pair);
+        values[getIndex(k)].add(pair);
         size++;
     }
 
@@ -42,11 +46,11 @@ public class HashSet<K, E> implements HashSetAPI<K, E>{
         if(keys.contains(k)){
             keys.remove(k);
             
-            if(values[k.hashCode()].size() == 1){
-                values[k.hashCode()] = null;
+            if(values[getIndex(k)].size() == 1){
+                values[getIndex(k)] = null;
                 size--;
             } else {
-                values[k.hashCode()].remove(new Pair(k, null));
+                values[getIndex(k)].remove(new Pair(k, null));
                 size--;
             }
         }
@@ -55,10 +59,10 @@ public class HashSet<K, E> implements HashSetAPI<K, E>{
     @Override
     public E get(K k) {
         if(keys.contains(k)){
-            if(values[k.hashCode()].size() == 1){
-                return values[k.hashCode()].getFirst().getValue();
+            if(values[getIndex(k)].size() == 1){
+                return values[getIndex(k)].getFirst().getValue();
             } else {
-                Iterator<Pair<K, E>> i = values[k.hashCode()].iterator();
+                Iterator<Pair<K, E>> i = values[getIndex(k)].iterator();
                 
                 while(i.hasNext()){
                     Pair<K, E> item = i.next();
@@ -113,7 +117,7 @@ public class HashSet<K, E> implements HashSetAPI<K, E>{
         @Override
         public E next() {
             if(i != keys.size()){
-                E item = (E) values[key.hashCode()].get(j).getValue();
+                E item = (E) values[key.hashCode() % SIZE].get(j).getValue();
                 
                 j++;
                 
