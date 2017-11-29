@@ -5,7 +5,6 @@
 package PasswordManager;
 
 import HashSetAPI.HashSet;
-import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -15,6 +14,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -27,6 +29,8 @@ public class Controls {
     private VBox root;
     private ObservableList<Password> list;
     private Controller controller;
+    private TableView table;
+    private Button removeBtn;
     
     public Controls(){
         list = FXCollections.observableArrayList(new Password());
@@ -68,13 +72,28 @@ public class Controls {
             
         });
         
-        row.getChildren().addAll(searchTF, searchBtn);
+        removeBtn = new Button("Pašalinti");
+        removeBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Password pass = (Password) table.getSelectionModel().getSelectedItem();
+                if(pass != null){
+                    controller.remove(pass.getPage());
+                    removeBtn.setDisable(true);
+                    
+                    showAll();
+                }
+            }
+        });
+        removeBtn.setDisable(true);
+        
+        row.getChildren().addAll(searchTF, searchBtn, showAllBtn, removeBtn);
         
         root.getChildren().add(row);
     }
     
     private void createTable(){
-        TableView table = new TableView();
+        table = new TableView();
         
         TableColumn page = new TableColumn("Puslapis");
         page.setResizable(false);
@@ -92,6 +111,22 @@ public class Controls {
         table.setItems(list);
         table.getColumns().addAll(page, username, password);
         table.setPrefHeight(450);
+        table.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                try{
+                    Clipboard clipboard = Clipboard.getSystemClipboard();
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(((Password)table.getSelectionModel().getSelectedItem()).getPassword());
+                    clipboard.setContent(content);
+                    
+                    removeBtn.setDisable(false);
+                } catch (Exception ex){
+                    removeBtn.setDisable(true);
+                }
+            }
+        
+        });
         
         root.getChildren().add(table);
     }
@@ -117,8 +152,6 @@ public class Controls {
             @Override
             public void handle(ActionEvent event) {
                 String passwordStr = controller.newItem(page.getText(), username.getText(), 8, 16);
-                /*page.setText("");
-                username.setText("");*/
                 password.setText(passwordStr);
                 
                 showAll();
@@ -131,7 +164,7 @@ public class Controls {
         root.getChildren().add(row);
     }
     
-    public void showAll(){
+    private void showAll(){
         list.clear();
         Password[] logins = controller.getAll();
         

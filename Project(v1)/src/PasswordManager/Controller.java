@@ -29,6 +29,10 @@ public class Controller {
         return returnedData;
     }
     
+    public void remove(String key){
+        data.remove(key);
+    }
+    
     public Password search(String key){
         return data.get(key);
     }
