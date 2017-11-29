@@ -65,7 +65,7 @@ public class Password {
         this.password = new String(password);
     }
     
-    public class Builder{
+    public static class Builder{
         private Password password;
         private int min;
         private int max;

@@ -12,30 +12,37 @@ import java.util.Random;
  * @author Mindaugas
  */
 public class Controller {
-    HashSetAPI<String, String> data;
+    HashSetAPI<String, Password> data;
     
-    public Controller(HashSetAPI dataSource){
+    public Controller(HashSetAPI<String, Password> dataSource){
         data = dataSource;
     }
     
-    public String[][] getAll(){
-        String[][] returnedData = new String[data.size()][];
+    public Password[] getAll(){
+        Password[] returnedData = new Password[data.size()];
         
-        String[] keys = (String[]) data.getKeys();
+        Object[] keys = data.getKeys();
         for(int i = 0; i < keys.length; i++){
-            returnedData[i] = new String[] {keys[i], data.get(keys[i])};
+            returnedData[i] = data.get((String)keys[i]);
         }
         
         return returnedData;
     }
     
-    public String[] search(String key){
-        return new String[] {key, data.get(key)};
+    public Password search(String key){
+        return data.get(key);
     }
     
-    public void newItem(String page, String username){
-        String password = "aaa";
+    public String newItem(String page, String username, int minBound, int maxBound){
+        Password newItem = new Password.Builder()
+                .setPage(page)
+                .setUsername(username)
+                .setMinBound(minBound)
+                .setMaxBound(maxBound)
+                .build();
         
-        data.add(page, username + ":" + password);
+        data.add(page, newItem);
+        
+        return newItem.getPassword();
     }
 }
