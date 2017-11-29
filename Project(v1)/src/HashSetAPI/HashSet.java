@@ -30,15 +30,17 @@ public class HashSet<K, E> implements HashSetAPI<K, E>{
     
     @Override
     public void add(K k, E e) {
-        keys.add(k);
-        
-        if(values[getIndex(k)] == null){
-            values[getIndex(k)] = new LinkedList<Pair<K, E>>();
+        if(!keys.contains(k)){
+            keys.add(k);
+
+            if(values[getIndex(k)] == null){
+                values[getIndex(k)] = new LinkedList<Pair<K, E>>();
+            }
+
+            Pair<K, E> pair = new Pair<>(k, e);
+            values[getIndex(k)].add(pair);
+            size++;
         }
-        
-        Pair<K, E> pair = new Pair<>(k, e);
-        values[getIndex(k)].add(pair);
-        size++;
     }
 
     @Override
