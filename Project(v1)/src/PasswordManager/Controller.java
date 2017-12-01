@@ -98,13 +98,7 @@ public class Controller {
                     String[] logins = line.split(":");
                     
                     if(logins[0].equals(user)){
-                        //byte[] refHash = digest.digest(logins[1].getBytes(StandardCharsets.UTF_8));
                         String hashed = new String(hash);
-                        /*for(int i = 0; i < hash.length; i++){
-                            if(hash[i] != (byte)logins[1].charAt(i)){
-                                return false;
-                            }
-                        }*/
                         
                         if(!hashed.equals(logins[1])){
                             return false;
@@ -113,6 +107,7 @@ public class Controller {
                         generateKey(pass);
                         this.user = user;
                         this.pass = pass;
+                        data.clear();
                         
                         return true;
                     }
@@ -151,9 +146,6 @@ public class Controller {
             byte[] encrypted = cipher.doFinal(content.getBytes(StandardCharsets.UTF_8));
             
             Files.write(Paths.get(user), encrypted);
-            BufferedWriter writer1 = new BufferedWriter(new FileWriter("str" + user));
-            writer1.write(content);
-            writer1.close();
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchPaddingException ex) {

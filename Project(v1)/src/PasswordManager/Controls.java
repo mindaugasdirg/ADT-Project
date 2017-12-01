@@ -209,12 +209,12 @@ public class Controls {
             public void handle(ActionEvent event) {
                 if(prefs.getText().equals("^")){
                     prefs.setText("v");
-                    //root.getChildren().add(root.getChildren().size() - 1, prefsRow);
+                    root.getChildren().add(root.getChildren().size() - 1, prefsRow);
                 } else {
                     prefs.setText("^");
                     //min = Integer.getInteger(minTF.getText());
                     //max = Integer.getInteger(maxTF.getText());
-                    //root.getChildren().remove(prefsRow);
+                    root.getChildren().remove(prefsRow);
                 }
             }
             
@@ -262,14 +262,16 @@ public class Controls {
     private void login(){
         Dialog<Pair<String, String>> loginScr = new Dialog<>();
         loginScr.setTitle("Prisijungti");
+        loginScr.setWidth(500);
         
         VBox main = new VBox();
         main.setSpacing(5);
         main.setAlignment(Pos.CENTER);
         
         HBox user = new HBox();
+        user.setPadding(new Insets(5, 0, 5, 0));
         user.setSpacing(5);
-        user.setAlignment(Pos.CENTER);
+        user.setAlignment(Pos.BASELINE_LEFT);
         
         Text userLb = new Text("Vartotojo vardas:");
         TextField userTF = new TextField();
@@ -277,8 +279,9 @@ public class Controls {
         user.getChildren().addAll(userLb, userTF);
         
         HBox pass = new HBox();
+        pass.setPadding(new Insets(5, 0, 5, 28));
         pass.setSpacing(5);
-        pass.setAlignment(Pos.CENTER);
+        pass.setAlignment(Pos.BASELINE_LEFT);
         
         Text passLb = new Text("Slaptažodis:");
         TextField passTF = new TextField();
@@ -292,6 +295,7 @@ public class Controls {
         ButtonType cancel = new ButtonType("Atšaukti", ButtonData.CANCEL_CLOSE);
         loginScr.getDialogPane().getButtonTypes().addAll(register, login, cancel);
         loginScr.getDialogPane().setContent(main);
+        loginScr.getDialogPane().setPrefWidth(400);
         
         loginScr.setResultConverter(dialogButton -> {
             if(dialogButton == register){
@@ -309,21 +313,36 @@ public class Controls {
             String userStr = results.get().getKey();
             String passStr = results.get().getValue();
             
-            if(userStr != null && !userStr.isEmpty() && passStr != null && !passStr.isEmpty()){
-                try{
-                    if(userStr.charAt(0) == (char)10){
-                        if(controller.register(userStr.substring(1), passStr)){
-                            generate.setDisable(false);
-                        }
-                    } else if(controller.login(userStr, passStr)){
-                        controller.loadFromFile();
-                        generate.setDisable(false);
-                        showAll();
-                    }
-                } catch (NoSuchAlgorithmException ex) {
-                    Logger.getLogger(Controls.class.getName()).log(Level.SEVERE, null, ex);
-                }
+            while(!validate(userStr, passStr)){
+                loginScr.setHeaderText("Neteisingas vartotojas arba slaptažodis");
+                results = loginScr.showAndWait();
+                userStr = results.get().getKey();
+                passStr = results.get().getValue();
             }
         }
+    }
+    
+    private boolean validate(String user, String pass){
+        if(user != null && !user.isEmpty() && pass != null && !pass.isEmpty()){
+            try{
+                if(user.charAt(0) == (char)10){
+                    if(controller.register(user.substring(1), pass)){
+                        generate.setDisable(false);
+                        
+                        return true;
+                    }
+                } else if(controller.login(user, pass)){
+                    controller.loadFromFile();
+                    generate.setDisable(false);
+                    showAll();
+                    
+                    return true;
+                }
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(Controls.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        return false;
     }
 }
