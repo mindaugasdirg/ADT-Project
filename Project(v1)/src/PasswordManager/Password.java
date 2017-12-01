@@ -52,6 +52,11 @@ public class Password {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    @Override
+    public String toString() {
+        return page + ":" + username + ":" + password;
+    }
     
     public void generateNewPassword(int min, int max){
         Random rand = new Random();
@@ -76,14 +81,14 @@ public class Password {
             max = 16;
         }
         
-        public Builder loadFromString(String data){
+        public Password loadFromString(String data){
             String[] fields = data.split(":");
             
             password.page = fields[0];
             password.username = fields[1];
             password.password = fields[2];
             
-            return this;
+            return password;
         }
         
         public Builder setPage(String page){

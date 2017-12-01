@@ -18,6 +18,7 @@ public class FxGui extends Application{
     public void start(Stage primaryStage) throws Exception {
         Controls ui = new Controls();
         Scene scene = new Scene(ui.getLayout(), 900, 500);
+        scene.getStylesheets().add("style.css");
         primaryStage.setTitle("Slaptas");
         primaryStage.setScene(scene);
         primaryStage.show();

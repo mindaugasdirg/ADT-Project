@@ -1,0 +1,16 @@
+.button {
+    -fx-pref-width: 70px;
+    -fx-pref-height: 18px;
+}
+
+.text-field {
+    -fx-pref-height: 20px;
+}
+
+.prefs-button {
+    -fx-pref-width: 30px;
+}
+
+.prefs-input {
+    -fx-pref-width: 35px;
+}
