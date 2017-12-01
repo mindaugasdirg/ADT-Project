@@ -5,11 +5,20 @@
 package PasswordManager;
 
 import HashSetAPI.HashSet;
+import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -18,8 +27,10 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 
 /**
  *
@@ -30,15 +41,27 @@ public class Controls {
     private ObservableList<Password> list;
     private Controller controller;
     private TableView table;
+    private Button generate;
     private Button removeBtn;
+    private HBox prefsRow;
+    private TextField minTF;
+    private int min;
+    private TextField maxTF;
+    private int max;
     
     public Controls(){
         list = FXCollections.observableArrayList(new Password());
         controller = new Controller(new HashSet<>());
         root = new VBox();
+        root.setSpacing(5);
+        root.setPadding(new Insets(5, 0, 5, 0));
         createTopRow();
         createTable();
+        createPrefsRow();
         createBottomRow();
+        min = 8;
+        max = 16;
+        login();
     }
     
     public VBox getLayout(){
@@ -47,9 +70,11 @@ public class Controls {
     
     private void createTopRow(){
         HBox row = new HBox();
+        row.setSpacing(5);
+        row.setPadding(new Insets(0, 0, 0, 5));
         
         TextField searchTF = new TextField();
-        searchTF.setText("Paieška");
+        searchTF.setPromptText("Paieška");
         
         Button searchBtn = new Button("Ieškoti");
         searchBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -59,6 +84,19 @@ public class Controls {
                 
                 list.clear();
                 list.add(found);
+            }
+            
+        });
+        
+ 
+        Pane spacer = new Pane();
+        spacer.setPrefWidth(430);
+        
+        Button login = new Button("Prisijungti");
+        login.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                login();
             }
             
         });
@@ -87,7 +125,7 @@ public class Controls {
         });
         removeBtn.setDisable(true);
         
-        row.getChildren().addAll(searchTF, searchBtn, showAllBtn, removeBtn);
+        row.getChildren().addAll(searchTF, searchBtn, spacer, login, showAllBtn, removeBtn);
         
         root.getChildren().add(row);
     }
@@ -97,15 +135,15 @@ public class Controls {
         
         TableColumn page = new TableColumn("Puslapis");
         page.setResizable(false);
-        page.setPrefWidth(300);
+        page.setPrefWidth(299);
         page.setCellValueFactory(new PropertyValueFactory<>("page"));
         TableColumn username = new TableColumn("Prisijungimo vardas");
         username.setResizable(false);
-        username.setPrefWidth(300);
+        username.setPrefWidth(299);
         username.setCellValueFactory(new PropertyValueFactory<>("username"));
         TableColumn password = new TableColumn("Slaptažodis");
         password.setResizable(false);
-        password.setPrefWidth(300);
+        password.setPrefWidth(299);
         password.setCellValueFactory(new PropertyValueFactory<>("password"));
         
         table.setItems(list);
@@ -133,6 +171,9 @@ public class Controls {
     
     private void createBottomRow(){
         HBox row = new HBox();
+        row.setSpacing(5);
+        row.setPadding(new Insets(0, 0, 0, 5));
+        row.setAlignment(Pos.BASELINE_LEFT);
         
         Text pageLb = new Text();
         pageLb.setText("Puslapis:");
@@ -147,21 +188,62 @@ public class Controls {
         TextField password = new TextField();
         password.setEditable(false);
         
-        Button generate = new Button("Generuoti");
+        generate = new Button("Generuoti");
         generate.setOnAction(new EventHandler<ActionEvent>() {
             @Override
+            public void handle(ActionEvent event) {                
+                if(min < max && !page.getText().trim().isEmpty() && !username.getText().trim().isEmpty()){
+                    String passwordStr = controller.newItem(page.getText(), username.getText(), min, max);
+                    password.setText(passwordStr);
+
+                    showAll();
+                }
+            }
+        });
+        generate.setDisable(true);
+        
+        Button prefs = new Button("^");
+        prefs.getStyleClass().add("prefs-button");
+        prefs.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
             public void handle(ActionEvent event) {
-                String passwordStr = controller.newItem(page.getText(), username.getText(), 8, 16);
-                password.setText(passwordStr);
-                
-                showAll();
+                if(prefs.getText().equals("^")){
+                    prefs.setText("v");
+                    root.getChildren().add(root.getChildren().size() - 1, prefsRow);
+                } else {
+                    prefs.setText("^");
+                    //min = Integer.getInteger(minTF.getText());
+                    //max = Integer.getInteger(maxTF.getText());
+                    root.getChildren().remove(prefsRow);
+                }
             }
             
         });
         
-        row.getChildren().addAll(pageLb, page, usernameLb, username, passwordLb, password, generate);
+        row.getChildren().addAll(pageLb, page, usernameLb, username, passwordLb, password, prefs, generate);
         
         root.getChildren().add(row);
+    }
+    
+    public void createPrefsRow(){
+        prefsRow = new HBox();
+        prefsRow.setSpacing(5);
+        prefsRow.setPadding(new Insets(0, 0, 0, 5));
+        prefsRow.setAlignment(Pos.BASELINE_CENTER);
+        
+        Text minLb = new Text();
+        minLb.setText("Trumpiausias:");
+        minTF = new TextField();
+        minTF.setText("8");
+        minTF.getStyleClass().add("prefs-input");
+        
+        Text maxLb = new Text();
+        maxLb.setText("Ilgiausias:");
+        maxTF = new TextField();
+        maxTF.setText("16");
+        maxTF.getStyleClass().add("prefs-input");
+        
+        prefsRow.getChildren().addAll(minLb, minTF, maxLb, maxTF);
     }
     
     private void showAll(){
@@ -175,5 +257,92 @@ public class Controls {
         if(list.size() == 0){
             list.add(new Password());
         }
+    }
+    
+    private void login(){
+        Dialog<Pair<String, String>> loginScr = new Dialog<>();
+        loginScr.setTitle("Prisijungti");
+        loginScr.setWidth(500);
+        
+        VBox main = new VBox();
+        main.setSpacing(5);
+        main.setAlignment(Pos.CENTER);
+        
+        HBox user = new HBox();
+        user.setPadding(new Insets(5, 0, 5, 0));
+        user.setSpacing(5);
+        user.setAlignment(Pos.BASELINE_LEFT);
+        
+        Text userLb = new Text("Vartotojo vardas:");
+        TextField userTF = new TextField();
+        
+        user.getChildren().addAll(userLb, userTF);
+        
+        HBox pass = new HBox();
+        pass.setPadding(new Insets(5, 0, 5, 28));
+        pass.setSpacing(5);
+        pass.setAlignment(Pos.BASELINE_LEFT);
+        
+        Text passLb = new Text("Slaptažodis:");
+        TextField passTF = new TextField();
+        
+        pass.getChildren().addAll(passLb, passTF);
+        
+        main.getChildren().addAll(user, pass);
+        
+        ButtonType register = new ButtonType("Naujas vartotojas", ButtonData.APPLY);
+        ButtonType login = new ButtonType("Prisijungti", ButtonData.OK_DONE);
+        ButtonType cancel = new ButtonType("Atšaukti", ButtonData.CANCEL_CLOSE);
+        loginScr.getDialogPane().getButtonTypes().addAll(register, login, cancel);
+        loginScr.getDialogPane().setContent(main);
+        loginScr.getDialogPane().setPrefWidth(400);
+        
+        loginScr.setResultConverter(dialogButton -> {
+            if(dialogButton == register){
+                return new Pair<>((char)10 + userTF.getText(), passTF.getText());
+            }
+            if(dialogButton == login){
+                return new Pair<>(userTF.getText(), passTF.getText());
+            }
+            return null;
+        });
+        
+        Optional<Pair<String, String>> results = loginScr.showAndWait();
+        
+        if(results.isPresent()){
+            String userStr = results.get().getKey();
+            String passStr = results.get().getValue();
+            
+            while(!validate(userStr, passStr)){
+                loginScr.setHeaderText("Neteisingas vartotojas arba slaptažodis");
+                results = loginScr.showAndWait();
+                userStr = results.get().getKey();
+                passStr = results.get().getValue();
+            }
+        }
+    }
+    
+    private boolean validate(String user, String pass){
+        if(user != null && !user.isEmpty() && pass != null && !pass.isEmpty()){
+            try{
+                if(user.charAt(0) == (char)10){
+                    if(controller.register(user.substring(1), pass)){
+                        generate.setDisable(false);
+                        
+                        return true;
+                    }
+                } else if(controller.login(user, pass)){
+                    controller.loadFromFile();
+                    generate.setDisable(false);
+                    showAll();
+                    
+                    return true;
+                }
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(Controls.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        return false;
     }
 }

@@ -78,6 +78,13 @@ public class HashSet<K, E> implements HashSetAPI<K, E>{
         
         return null;
     }
+    
+    @Override
+    public void clear(){
+        keys = new LinkedList<>();
+        values = new LinkedList[SIZE];
+        size = 0;
+    }
 
     @Override
     public Object[] getKeys() {
@@ -119,11 +126,11 @@ public class HashSet<K, E> implements HashSetAPI<K, E>{
         @Override
         public E next() {
             if(i != keys.size()){
-                E item = (E) values[key.hashCode() % SIZE].get(j).getValue();
+                E item = (E) values[getIndex(key)].get(j).getValue();
                 
                 j++;
                 
-                if(j == values[key.hashCode()].size()){
+                if(j == values[getIndex(key)].size()){
                     i++;
                     j = 0;
                     if(i < keys.size()){
