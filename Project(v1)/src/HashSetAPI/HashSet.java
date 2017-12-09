@@ -4,8 +4,8 @@
  */
 package HashSetAPI;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Objects;
 
 /**
@@ -14,13 +14,13 @@ import java.util.Objects;
  */
 public class HashSet<K, E> implements HashSetAPI<K, E>{
     private static final int SIZE = 2000000;
-    private LinkedList<K> keys;
-    private LinkedList<Pair<K, E>>[] values;
+    //private ArrayList<K> keys;
+    private PairNode<K, E>[] values;
     private int size;
     
     public HashSet(){
-        keys = new LinkedList<>();
-        values = new LinkedList[SIZE];
+        //keys = new ArrayList<>();
+        values = new PairNode[SIZE];
         size = 0;
     }
     
@@ -30,49 +30,62 @@ public class HashSet<K, E> implements HashSetAPI<K, E>{
     
     @Override
     public void add(K k, E e) {
-        if(!keys.contains(k)){
-            keys.add(k);
-
-            if(values[getIndex(k)] == null){
-                values[getIndex(k)] = new LinkedList<Pair<K, E>>();
+        PairNode<K, E> last = values[getIndex(k)];
+        
+        if(last == null){
+            values[getIndex(k)] = new PairNode<>(k ,e);
+            size++;
+        } else {
+            while(last.getNext() != null){
+                if(last.getKey().equals(k)){ // no dublicates
+                    return;
+                }
+                
+                last = last.getNext();
             }
-
-            Pair<K, E> pair = new Pair<>(k, e);
-            values[getIndex(k)].add(pair);
+            
+            last.setNext(new PairNode<>(k, e));
             size++;
         }
+        /*if(!keys.contains(k)){
+            keys.add(k);
+            PairNode<K, E> pair = new PairNode<>(k, e);
+            pair.setNext(values[getIndex(k)]);
+            values[getIndex(k)] = pair;
+            size++;
+        }*/
     }
 
     @Override
     public void remove(K k) {
-        if(keys.contains(k)){
-            keys.remove(k);
+        //if(keys.contains(k)){
+            //keys.remove(k);
             
-            if(values[getIndex(k)].size() == 1){
-                values[getIndex(k)] = null;
+            if(values[getIndex(k)].getKey().equals(k)){
+                values[getIndex(k)] = values[getIndex(k)].getNext();
                 size--;
-            } else {
-                values[getIndex(k)].remove(new Pair(k, null));
-                size--;
+                return;
+            } else if(values[getIndex(k)] != null){
+                PairNode<K, E> last = values[getIndex(k)];
+                
+                for(PairNode<K, E> i = values[getIndex(k)].getNext(); i.getNext() != null; i = i.getNext()){
+                    if(i.getKey().equals(k)){
+                        last.setNext(i.getNext());
+                        size--;
+                        return;
+                    }
+                    
+                    last = i;
+                }
             }
-        }
+        //}
     }
 
     @Override
     public E get(K k) {
-        if(keys.contains(k)){
-            if(values[getIndex(k)].size() == 1){
-                return values[getIndex(k)].getFirst().getValue();
-            } else {
-                Iterator<Pair<K, E>> i = values[getIndex(k)].iterator();
-                
-                while(i.hasNext()){
-                    Pair<K, E> item = i.next();
-                    
-                    if(item.getKey().equals(k)){
-                        return item.getValue();
-                    }
-                }
+        for(PairNode<K, E> i = values[getIndex(k)]; i != null; i = i.getNext()){
+            if(i.getKey().equals(k)){
+                return i.getValue();
             }
         }
         
@@ -81,20 +94,34 @@ public class HashSet<K, E> implements HashSetAPI<K, E>{
     
     @Override
     public void clear(){
-        keys = new LinkedList<>();
-        values = new LinkedList[SIZE];
+        //keys = new ArrayList<>();
+        values = new PairNode[SIZE];
         size = 0;
     }
 
     @Override
     public Object[] getKeys() {
+        int count = 0;
+        Object[] keys = new Object[size];
+        for(PairNode<K ,E> node : values){
+            PairNode<K, E> i = node;
+            
+            while(i != null){
+                keys[count] = i.getKey();
+                i = i.getNext();
+                count++;
+            }
+        }
+        
+        return keys;
+        /*
         Object[] keyArray = new Object[keys.size()];
         
         for(int i = 0; i < keys.size(); i++){
             keyArray[i] = keys.get(i);
         }
         
-        return keyArray;
+        return keyArray;*/
     }
     
     @Override
@@ -109,35 +136,35 @@ public class HashSet<K, E> implements HashSetAPI<K, E>{
     
     private class HashSetIterator<E> implements Iterator<E>{
         int i;
-        int j;
-        K key;
+        PairNode<K, E> j;
+        //K key;
         
         public HashSetIterator(){
             i = 0;
-            j = 0;
-            key = keys.get(i);
+            //key = keys.get(i);
+            j = (PairNode<K, E>) values[i];
+            
+            while(j == null && i < SIZE - 1){
+                i++;
+                j = (PairNode<K, E>) values[i];
+            }
         }
         
         @Override
         public boolean hasNext() {
-            return i != keys.size();
+            return j != null;
         }
 
         @Override
         public E next() {
-            if(i != keys.size()){
-                E item = (E) values[getIndex(key)].get(j).getValue();
+            if(i < SIZE && j != null){
+                E item = j.getValue();
                 
-                j++;
+                j = j.getNext();
                 
-                if(j == values[getIndex(key)].size()){
+                while(j == null && i < SIZE - 1){
                     i++;
-                    j = 0;
-                    if(i < keys.size()){
-                        key = keys.get(i);
-                    } else {
-                        key = null;
-                    }
+                    j = (PairNode<K, E>) values[i];
                 }
                 
                 return item;
@@ -147,13 +174,23 @@ public class HashSet<K, E> implements HashSetAPI<K, E>{
         }
     }
     
-    private class Pair<K, E>{
+    private class PairNode<K, E>{
         private K key;
         private E value;
+        private PairNode<K, E> next;
         
-        public Pair(K k, E e){
+        public PairNode(K k, E e){
             key = k;
             value = e;
+            next = null;
+        }
+        
+        public PairNode<K, E> getNext(){
+            return next;
+        }
+        
+        public void setNext(PairNode<K, E> node){
+            next = node;
         }
 
         public K getKey() {
@@ -190,7 +227,7 @@ public class HashSet<K, E> implements HashSetAPI<K, E>{
             if (getClass() != obj.getClass()) {
                 return false;
             }
-            final Pair<?, ?> other = (Pair<?, ?>) obj;
+            final PairNode<?, ?> other = (PairNode<?, ?>) obj;
             if (!Objects.equals(this.key, other.key)) {
                 return false;
             }

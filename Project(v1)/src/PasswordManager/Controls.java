@@ -316,8 +316,11 @@ public class Controls {
             while(!validate(userStr, passStr)){
                 loginScr.setHeaderText("Neteisingas vartotojas arba slaptažodis");
                 results = loginScr.showAndWait();
-                userStr = results.get().getKey();
-                passStr = results.get().getValue();
+                
+                if(results.isPresent()){
+                    userStr = results.get().getKey();
+                    passStr = results.get().getValue();
+                }
             }
         }
     }

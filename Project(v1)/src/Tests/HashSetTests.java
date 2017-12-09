@@ -5,6 +5,7 @@
 package Tests;
 
 import HashSetAPI.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -46,7 +47,16 @@ public class HashSetTests {
         }
         
         Object[] keys = testSet.getKeys();
-        if((Integer)keys[0] == 1 && (Integer)keys[1] == 2 && (Integer)keys[2] == 3 && (Integer)keys[3] == 4){
+        ArrayList<Integer> trueKeys = new ArrayList<>();
+        trueKeys.add(1);
+        trueKeys.add(2);
+        trueKeys.add(3);
+        trueKeys.add(4);
+        for(Object key : keys){
+            trueKeys.remove(key);
+        }
+        
+        if(trueKeys.size() == 0){
             successful++;
         }
         testSet.remove(1);
@@ -89,9 +99,19 @@ public class HashSetTests {
         }
         
         Object[] keys = testSet.getKeys();
-        if((String)keys[0] == "a" && (String)keys[1] == "A" && (String)keys[2] == "b" && (String)keys[3] == "AAA"){
+        ArrayList<String> trueKeys = new ArrayList<>();
+        trueKeys.add("a");
+        trueKeys.add("A");
+        trueKeys.add("b");
+        trueKeys.add("AAA");
+        for(Object key : keys){
+            trueKeys.remove(key);
+        }
+        
+        if(trueKeys.size() == 0){
             successful++;
         }
+        
         testSet.remove("a");
         if(testSet.size() == 3 && testSet.get("a") == null){
             successful++;
@@ -115,31 +135,26 @@ public class HashSetTests {
         testSet.add("AAA", 5);
         
         Iterator<Integer> i = testSet.iterator();
-        Integer[] set = new Integer[10];
         int count = 0;
+        ArrayList<Integer> values = new ArrayList<>();
+        values.add(1);
+        values.add(2);
+        values.add(3);
+        values.add(5);
         
         while(i.hasNext()){
-            set[count] = i.next();
+            values.remove(i.next());
             count++;
         }
         
         if(count == 4){
             successful++;
         }
-        if(set[0] == 1){
-            successful++;
-        }
-        if(set[1] == 2){
-            successful++;
-        }
-        if(set[2] == 3){
-            successful++;
-        }
-        if(set[3] == 5){
+        if(values.size() == 0){
             successful++;
         }
         
-        if(successful == 5){
+        if(successful == 2){
             System.out.println("Test 3 successful");
         } else {
             System.out.println("Test 3 failed");
