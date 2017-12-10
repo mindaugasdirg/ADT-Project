@@ -128,6 +128,11 @@ public class HashSet<K, E> implements HashSetAPI<K, E>{
     public int size(){
         return size;
     }
+    
+    @Override
+    public boolean isEmpty(){
+        return size == 0;
+    }
 
     @Override
     public Iterator<E> iterator() {

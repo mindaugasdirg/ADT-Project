@@ -6,7 +6,8 @@
 package HashSetAPI;
 
 /**
- *
+ * Interface for HashSet data type
+ * 
  * @author Mindaugas
  */
 public interface HashSetAPI<K, E> extends Iterable<E>{
@@ -16,4 +17,5 @@ public interface HashSetAPI<K, E> extends Iterable<E>{
     E get(K k);
     Object[] getKeys();
     int size();
+    boolean isEmpty();
 }
