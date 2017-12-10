@@ -7,7 +7,8 @@ package PasswordManager;
 import java.util.Random;
 
 /**
- *
+ * Holds all the information about login.
+ * 
  * @author Mindaugas
  */
 public class Password {
@@ -17,12 +18,22 @@ public class Password {
     private String username;
     private String password;
 
+    /**
+     * Empty constructor.
+     */
     public Password(){
         page = "";
         username = "";
         password = "";
     }
     
+    /**
+     * Constructor with defined fields.
+     * 
+     * @param page
+     * @param username
+     * @param password 
+     */
     public Password(String page, String username, String password) {
         this.page = page;
         this.username = username;
@@ -58,6 +69,12 @@ public class Password {
         return page + ":" + username + ":" + password;
     }
     
+    /**
+     * Generates new random password.
+     * 
+     * @param min minimum length of password
+     * @param max maximum length of password
+     */
     public void generateNewPassword(int min, int max){
         Random rand = new Random();
         int length = rand.nextInt(max - min) + min;
@@ -70,6 +87,9 @@ public class Password {
         this.password = new String(password);
     }
     
+    /**
+     * Password builder.
+     */
     public static class Builder{
         private Password password;
         private int min;

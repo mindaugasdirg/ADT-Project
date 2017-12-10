@@ -11,7 +11,8 @@ import java.util.TreeMap;
 import studijosKTU.Timekeeper;
 
 /**
- *
+ * Speed test of HashSet data structure.
+ * 
  * @author Mindaugas
  */
 public class SpeedTest {

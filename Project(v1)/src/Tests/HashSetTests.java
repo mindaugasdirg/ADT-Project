@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- *
+ * Testing class for HashSet data structure.
+ * 
  * @author Mindaugas
  */
 public class HashSetTests {

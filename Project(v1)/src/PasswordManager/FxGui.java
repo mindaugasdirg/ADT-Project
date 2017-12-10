@@ -9,7 +9,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
- *
+ * GUI starting program.
+ * 
  * @author Mindaugas
  */
 public class FxGui extends Application{

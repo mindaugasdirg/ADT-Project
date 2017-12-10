@@ -33,7 +33,8 @@ import javafx.scene.text.Text;
 import javafx.util.Pair;
 
 /**
- *
+ * View of the GUI.
+ * 
  * @author Mindaugas
  */
 public class Controls {
@@ -43,12 +44,10 @@ public class Controls {
     private TableView table;
     private Button generate;
     private Button removeBtn;
-    private HBox prefsRow;
-    private TextField minTF;
-    private int min;
-    private TextField maxTF;
-    private int max;
     
+    /**
+     * Default constructor
+     */
     public Controls(){
         list = FXCollections.observableArrayList(new Password());
         controller = new Controller(new HashSet<>());
@@ -57,13 +56,15 @@ public class Controls {
         root.setPadding(new Insets(5, 0, 5, 0));
         createTopRow();
         createTable();
-        createPrefsRow();
         createBottomRow();
-        min = 8;
-        max = 16;
         login();
     }
     
+    /**
+     * Returns root node.
+     * 
+     * @return root element of layout
+     */
     public VBox getLayout(){
         return root;
     }
@@ -192,58 +193,17 @@ public class Controls {
         generate.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {                
-                if(min < max && !page.getText().trim().isEmpty() && !username.getText().trim().isEmpty()){
-                    String passwordStr = controller.newItem(page.getText(), username.getText(), min, max);
-                    password.setText(passwordStr);
+                String passwordStr = controller.newItem(page.getText(), username.getText(), 8, 16);
+                password.setText(passwordStr);
 
-                    showAll();
-                }
+                showAll();
             }
         });
         generate.setDisable(true);
         
-        Button prefs = new Button("^");
-        prefs.getStyleClass().add("prefs-button");
-        prefs.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                if(prefs.getText().equals("^")){
-                    prefs.setText("v");
-                    root.getChildren().add(root.getChildren().size() - 1, prefsRow);
-                } else {
-                    prefs.setText("^");
-                    //min = Integer.getInteger(minTF.getText());
-                    //max = Integer.getInteger(maxTF.getText());
-                    root.getChildren().remove(prefsRow);
-                }
-            }
-            
-        });
-        
-        row.getChildren().addAll(pageLb, page, usernameLb, username, passwordLb, password, prefs, generate);
+        row.getChildren().addAll(pageLb, page, usernameLb, username, passwordLb, password, generate);
         
         root.getChildren().add(row);
-    }
-    
-    public void createPrefsRow(){
-        prefsRow = new HBox();
-        prefsRow.setSpacing(5);
-        prefsRow.setPadding(new Insets(0, 0, 0, 5));
-        prefsRow.setAlignment(Pos.BASELINE_CENTER);
-        
-        Text minLb = new Text();
-        minLb.setText("Trumpiausias:");
-        minTF = new TextField();
-        minTF.setText("8");
-        minTF.getStyleClass().add("prefs-input");
-        
-        Text maxLb = new Text();
-        maxLb.setText("Ilgiausias:");
-        maxTF = new TextField();
-        maxTF.setText("16");
-        maxTF.getStyleClass().add("prefs-input");
-        
-        prefsRow.getChildren().addAll(minLb, minTF, maxLb, maxTF);
     }
     
     private void showAll(){
