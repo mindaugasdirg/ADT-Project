@@ -27,7 +27,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- *
+ * Data controller for GUI program
+ * 
  * @author Mindaugas
  */
 public class Controller {
@@ -36,6 +37,11 @@ public class Controller {
     String user;
     String pass;
     
+    /**
+     * Default constructor.
+     * 
+     * @param dataSource HashSetAPI object where items will be saved
+     */
     public Controller(HashSetAPI<String, Password> dataSource){
         data = dataSource;
         
@@ -49,6 +55,14 @@ public class Controller {
         }
     }
     
+    /**
+     * Registers a new user.
+     * 
+     * @param user username of user
+     * @param pass user's password
+     * @return true if registration was successful
+     * @throws NoSuchAlgorithmException 
+     */
     public boolean register(String user, String pass) throws NoSuchAlgorithmException{
         File source = new File(user);
         
@@ -81,6 +95,14 @@ public class Controller {
         return false;
     }
     
+    /**
+     * Tries to login the user.
+     * 
+     * @param user user's username
+     * @param pass user's password
+     * @return true if login was successful
+     * @throws NoSuchAlgorithmException 
+     */
     public boolean login(String user, String pass) throws NoSuchAlgorithmException{
         File source = new File(user);
         
@@ -132,6 +154,9 @@ public class Controller {
         }
     }
     
+    /**
+     * Saves all data to file.
+     */
     public void saveToFile(){
         try {
             String content = "";
@@ -161,6 +186,9 @@ public class Controller {
         }
     }
     
+    /**
+     * Loads all login information from the file
+     */
     public void loadFromFile(){
         if(key != null && user != null){
             try {
@@ -194,6 +222,11 @@ public class Controller {
         }
     }
     
+    /**
+     * Returns all the login information saved.
+     * 
+     * @return Array of all logins
+     */
     public Password[] getAll(){
         Password[] returnedData = new Password[data.size()];
         
@@ -205,15 +238,35 @@ public class Controller {
         return returnedData;
     }
     
+    /**
+     * Removes password from the list.
+     * 
+     * @param key Key of the password
+     */
     public void remove(String key){
         data.remove(key);
         saveToFile();
     }
     
+    /**
+     * Finds login information with the key
+     * 
+     * @param key key of the login
+     * @return login information
+     */
     public Password search(String key){
         return data.get(key);
     }
     
+    /**
+     * Creates new login
+     * 
+     * @param page Page of the login (key).
+     * @param username user's username
+     * @param minBound shortest possible password
+     * @param maxBound longest possible password
+     * @return generated password
+     */
     public String newItem(String page, String username, int minBound, int maxBound){
         Password newItem = new Password.Builder()
                 .setPage(page)
